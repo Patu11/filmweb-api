@@ -19,7 +19,7 @@ public class SeriesScraper {
 
 	public Series getSeries(String seriesUrl) {
 		Document seriesDocument = getDocumentFromUrl(seriesUrl);
-		return new Series(getTitle(seriesDocument), getPhotoUrl(seriesDocument), getSeasons(seriesDocument));
+		return new Series(getTitle(seriesDocument), getPhotoUrl(seriesDocument), seriesUrl, getSeasons(seriesDocument));
 	}
 
 	private List<Season> getSeasons(Document seriesDocument) {
