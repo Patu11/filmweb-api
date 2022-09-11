@@ -7,43 +7,41 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-public class Scraper {
+@Component
+public class SeriesScraper {
 	private static final String FILMWEB_URL = "https://www.filmweb.pl";
-	private final Document doc;
 
-	public Scraper(String url) {
-		this.doc = getDocumentFromUrl(url);
+	public Series getSeries(String seriesUrl) {
+		Document seriesDocument = getDocumentFromUrl(seriesUrl);
+		return new Series(getTitle(seriesDocument), getPhotoUrl(seriesDocument), getSeasons(seriesDocument));
 	}
 
-	public Series getSeries() {
-		return new Series(getTitle(), getPhotoUrl(), getSeasons());
-	}
-
-	public List<Season> getSeasons() {
-		return getSeasonsUrls().stream()
+	private List<Season> getSeasons(Document seriesDocument) {
+		return getSeasonsUrls(seriesDocument).stream()
 				.map(this::mapSeason)
 				.toList();
 	}
 
-	public String getTitle() {
-		String largeTitle = doc.getElementsByClass("filmCoverSection__title").stream()
+	private String getTitle(Document seriesDocument) {
+		String largeTitle = seriesDocument.getElementsByClass("filmCoverSection__title").stream()
 				.findFirst()
 				.map(Element::text)
 				.orElseGet(String::new);
 
-		return doc.getElementsByClass("filmCoverSection__originalTitle").stream()
+		return seriesDocument.getElementsByClass("filmCoverSection__originalTitle").stream()
 				.findFirst()
 				.map(Element::text)
 				.orElse(largeTitle);
 	}
 
-	public String getPhotoUrl() {
-		return Optional.ofNullable(doc.getElementById("filmPoster"))
+	private String getPhotoUrl(Document seriesDocument) {
+		return Optional.ofNullable(seriesDocument.getElementById("filmPoster"))
 				.map(img -> img.attr("content"))
 				.orElseThrow(() -> new RuntimeException("Photo not found"));
 	}
@@ -90,8 +88,8 @@ public class Scraper {
 		return new Episode(title, date);
 	}
 
-	private List<String> getSeasonsUrls() {
-		return doc.getElementsByClass("squareNavigation__item").stream()
+	private List<String> getSeasonsUrls(Document seriesDocument) {
+		return seriesDocument.getElementsByClass("squareNavigation__item").stream()
 				.map(el -> el.attr("href"))
 				.map(url -> FILMWEB_URL + url)
 				.toList();
