@@ -19,7 +19,13 @@ public class SeriesScraper {
 
 	public Series getSeries(String seriesUrl) {
 		Document seriesDocument = getDocumentFromUrl(seriesUrl);
-		return new Series(getTitle(seriesDocument), getPhotoUrl(seriesDocument), seriesUrl, getSeasons(seriesDocument));
+		return new Series(getTitle(seriesDocument), getPhotoUrl(seriesDocument), seriesUrl, getRating(seriesDocument), getSeasons(seriesDocument));
+	}
+
+	private float getRating(Document seriesDocument) {
+		Elements ratingPanel = seriesDocument.getElementsByClass("filmRating--hasPanel");
+		String rating = ratingPanel.select(".filmRating__rateValue").text();
+		return Float.parseFloat(rating.replace(",", "."));
 	}
 
 	private List<Season> getSeasons(Document seriesDocument) {
@@ -68,24 +74,49 @@ public class SeriesScraper {
 	private List<Episode> getSeasonEpisodes(String seasonUrl) {
 		Document seasonDoc = getDocumentFromUrl(seasonUrl);
 		Elements episodes = seasonDoc.getElementsByClass("previewEpisode");
+		Elements cards = episodes.select(".preview__card");
 
-		Elements episodesInfo = episodes.select(".preview__link");
-
-		return episodesInfo.stream()
+		return cards.stream()
 				.map(this::mapEpisode)
 				.toList();
 	}
 
-	private Episode mapEpisode(Element element) {
-		Elements children = element.children();
-		String title = children.stream()
-				.filter(el -> el.hasAttr("data-source-title"))
+	private Episode mapEpisode(Element previewCard) {
+		Elements previewLink = previewCard.select(".preview__link");
+		Elements previewContent = previewCard.select(".preview__content");
+
+		String title = getEpisodeTitle(previewLink);
+		String date = getEpisodeDate(previewLink);
+		float rating = getEpisodeRating(previewContent);
+
+		return new Episode(title, date, rating);
+	}
+
+	private float getEpisodeRating(Elements previewContent) {
+		String episodeUrl = previewContent.stream()
+				.findFirst()
+				.map(el -> el.getElementsByAttribute("href").attr("href"))
+				.orElseGet(String::new);
+
+		Document episodeDoc = getDocumentFromUrl(FILMWEB_URL + episodeUrl);
+
+		return episodeDoc.getElementsByClass("filmRating__rateValue").stream()
 				.findFirst()
 				.map(Element::text)
-				.orElseGet(String::new);
-		String date = children.select(".preview__year").text();
+				.map(r -> r.replace(",", "."))
+				.map(Float::valueOf)
+				.orElse(-1.0f);
+	}
 
-		return new Episode(title, date);
+	private String getEpisodeTitle(Elements previewLink) {
+		return previewLink.stream()
+				.findFirst()
+				.map(el -> el.getElementsByAttribute("data-source-title").text())
+				.orElseGet(String::new);
+	}
+
+	private String getEpisodeDate(Elements previewLink) {
+		return previewLink.select(".preview__year").text();
 	}
 
 	private List<String> getSeasonsUrls(Document seriesDocument) {
