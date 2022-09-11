@@ -30,12 +30,16 @@ public class Scraper {
 				.toList();
 	}
 
-	//TODO fix title scraping
 	public String getTitle() {
+		String largeTitle = doc.getElementsByClass("filmCoverSection__title").stream()
+				.findFirst()
+				.map(Element::text)
+				.orElseGet(String::new);
+
 		return doc.getElementsByClass("filmCoverSection__originalTitle").stream()
 				.findFirst()
 				.map(Element::text)
-				.orElseThrow(() -> new RuntimeException("Title not found"));
+				.orElse(largeTitle);
 	}
 
 	public String getPhotoUrl() {
