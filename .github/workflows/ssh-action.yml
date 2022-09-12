@@ -2,7 +2,7 @@ name: Remote SSH Deploy
 on:
   push:
     branches:
-      - github-action-update
+      - main
 jobs:
 
   test:
@@ -18,10 +18,15 @@ jobs:
       - name: Run tests
         run: mvn test
 
-  posttest:
+  deploy:
     needs: test
-    name: Post tests check
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Printing out message
-        run: echo ====Test complete====
+      - name: Executing remote SSH command
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: ${{ secrets.SCRIPT }}
