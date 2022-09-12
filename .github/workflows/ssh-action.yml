@@ -21,4 +21,5 @@ jobs:
     name: Post Tests check
     runs-on: ubuntu-latest
     steps:
-      - run: echo ====Test complete====
+      - name: Printing out message
+        run: echo ====Test complete====
