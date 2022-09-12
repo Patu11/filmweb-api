@@ -1,4 +1,4 @@
-package com.github.patu11.filmwebapi.api;
+package com.github.patu11.filmwebapi.api.service;
 
 import com.github.patu11.filmwebapi.api.dto.SeriesRequest;
 import com.github.patu11.filmwebapi.scrapper.SeriesScraper;

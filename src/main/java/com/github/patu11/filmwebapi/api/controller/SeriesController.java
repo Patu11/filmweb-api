@@ -1,6 +1,7 @@
-package com.github.patu11.filmwebapi.api;
+package com.github.patu11.filmwebapi.api.controller;
 
 import com.github.patu11.filmwebapi.api.dto.SeriesRequest;
+import com.github.patu11.filmwebapi.api.service.SeriesService;
 import com.github.patu11.filmwebapi.scrapper.model.Series;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
