@@ -18,7 +18,7 @@ jobs:
         run: mvn test
 
   posttest:
-    name: Post Tests check
+    name: Post tests check
     runs-on: ubuntu-latest
     steps:
       - name: Printing out message
