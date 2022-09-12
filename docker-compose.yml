@@ -6,6 +6,8 @@ services:
       - "8080:8080"
     links:
       - redis
+    env_file:
+      - security_credentials.env
   redis:
     image: redis
     ports:
