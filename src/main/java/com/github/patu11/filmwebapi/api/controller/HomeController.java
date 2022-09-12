@@ -10,6 +10,6 @@ public class HomeController {
 
 	@GetMapping
 	public String home() {
-		return "Welcome to filmweb api";
+		return "Welcome to Filmweb API";
 	}
 }

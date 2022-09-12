@@ -12,4 +12,4 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          script: ${{ env.SCRIPT }}
+          script: ${{ secrets.SCRIPT }}
