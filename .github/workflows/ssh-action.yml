@@ -13,11 +13,13 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v3.5.0
         with:
-          java-version: 17
+          distribution: 'adopt'
+          java-version: '17'
       - name: Run tests
         run: mvn test
 
   posttest:
+    needs: test
     name: Post tests check
     runs-on: ubuntu-latest
     steps:
