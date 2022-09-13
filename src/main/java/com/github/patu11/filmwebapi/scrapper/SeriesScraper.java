@@ -19,7 +19,11 @@ public class SeriesScraper {
 
 	public Series getSeries(String seriesUrl) {
 		Document seriesDocument = getDocumentFromUrl(seriesUrl);
-		return new Series(seriesUrl, getTitle(seriesDocument), getPhotoUrl(seriesDocument), getRating(seriesDocument), getSeriesDescription(seriesDocument), getSeasons(seriesDocument));
+		return getSeries(seriesDocument);
+	}
+
+	public Series getSeries(Document seriesDocument) {
+		return new Series(getSeriesUrl(seriesDocument), getTitle(seriesDocument), getPhotoUrl(seriesDocument), getRating(seriesDocument), getSeriesDescription(seriesDocument), getSeasons(seriesDocument));
 	}
 
 	private String getSeriesDescription(Document seriesDocument) {
@@ -153,6 +157,15 @@ public class SeriesScraper {
 		return previewLink.stream()
 				.findFirst()
 				.map(el -> el.attr("href"));
+	}
+
+	private String getSeriesUrl(Document seriesDocument) {
+		return seriesDocument.getElementsByTag("link")
+				.stream()
+				.map(el -> el.attr("href"))
+				.filter(href -> href.startsWith(FILMWEB_URL + "/serial/"))
+				.findFirst()
+				.orElseGet(String::new);
 	}
 
 	private Document getDocumentFromUrl(String url) {
