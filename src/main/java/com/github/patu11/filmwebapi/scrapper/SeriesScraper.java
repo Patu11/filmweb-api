@@ -19,7 +19,11 @@ public class SeriesScraper {
 
 	public Series getSeries(String seriesUrl) {
 		Document seriesDocument = getDocumentFromUrl(seriesUrl);
-		return new Series(seriesUrl, getTitle(seriesDocument), getPhotoUrl(seriesDocument), getRating(seriesDocument), getSeriesDescription(seriesDocument), getSeasons(seriesDocument));
+		return getSeries(seriesDocument);
+	}
+
+	public Series getSeries(Document seriesDocument) {
+		return new Series(getSeriesUrl(seriesDocument), getTitle(seriesDocument), getPhotoUrl(seriesDocument), getRating(seriesDocument), getSeriesDescription(seriesDocument), getSeasons(seriesDocument));
 	}
 
 	private String getSeriesDescription(Document seriesDocument) {
@@ -92,12 +96,11 @@ public class SeriesScraper {
 
 	private Episode mapEpisode(Element previewCard) {
 		Elements previewLink = previewCard.select(".preview__link");
-		Elements previewContent = previewCard.select(".preview__content");
 		Elements previewHeader = previewCard.select(".preview__header");
 
 		String title = getEpisodeTitle(previewLink);
 		String date = getEpisodeDate(previewLink);
-		float rating = getEpisodeRating(previewContent);
+		float rating = getEpisodeRating(previewLink);
 		String description = getEpisodeDescription(previewHeader);
 
 		return new Episode(title, date, rating, description);
@@ -105,9 +108,7 @@ public class SeriesScraper {
 
 	private String getEpisodeDescription(Elements previewHeader) {
 		Elements previewLink = previewHeader.select(".preview__link");
-		Optional<String> episodeUrl = previewLink.stream()
-				.findFirst()
-				.map(el -> el.attr("href"));
+		Optional<String> episodeUrl = getEpisodeUrl(previewLink);
 
 		if (episodeUrl.isEmpty()) {
 			return "";
@@ -121,11 +122,8 @@ public class SeriesScraper {
 				.orElseGet(String::new);
 	}
 
-	private float getEpisodeRating(Elements previewContent) {
-		String episodeUrl = previewContent.stream()
-				.findFirst()
-				.map(el -> el.getElementsByAttribute("href").attr("href"))
-				.orElseGet(String::new);
+	private float getEpisodeRating(Elements previewLink) {
+		String episodeUrl = getEpisodeUrl(previewLink).orElseGet(String::new);
 
 		Document episodeDoc = getDocumentFromUrl(FILMWEB_URL + episodeUrl);
 
@@ -153,6 +151,21 @@ public class SeriesScraper {
 				.map(el -> el.attr("href"))
 				.map(url -> FILMWEB_URL + url)
 				.toList();
+	}
+
+	private Optional<String> getEpisodeUrl(Elements previewLink) {
+		return previewLink.stream()
+				.findFirst()
+				.map(el -> el.attr("href"));
+	}
+
+	private String getSeriesUrl(Document seriesDocument) {
+		return seriesDocument.getElementsByTag("link")
+				.stream()
+				.map(el -> el.attr("href"))
+				.filter(href -> href.startsWith(FILMWEB_URL + "/serial/"))
+				.findFirst()
+				.orElseGet(String::new);
 	}
 
 	private Document getDocumentFromUrl(String url) {
