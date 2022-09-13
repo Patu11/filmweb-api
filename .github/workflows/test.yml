@@ -8,6 +8,10 @@ jobs:
   test:
     name: Tests
     runs-on: ubuntu-latest
+    env:
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      CACHE_TYPE: ${{ secrets.CACHE_TYPE }}
     steps:
       - uses: actions/checkout@v2.4.2
       - name: Set up JDK 17
