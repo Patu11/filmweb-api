@@ -19,7 +19,16 @@ public class SeriesScraper {
 
 	public Series getSeries(String seriesUrl) {
 		Document seriesDocument = getDocumentFromUrl(seriesUrl);
-		return new Series(getTitle(seriesDocument), getPhotoUrl(seriesDocument), seriesUrl, getRating(seriesDocument), getSeasons(seriesDocument));
+		return new Series(seriesUrl, getTitle(seriesDocument), getPhotoUrl(seriesDocument), getRating(seriesDocument), getDescription(seriesDocument), getSeasons(seriesDocument));
+	}
+
+	private String getDescription(Document seriesDocument) {
+		Elements descriptionSection = seriesDocument.getElementsByClass("filmPosterSection__plot");
+		return descriptionSection.stream()
+				.findFirst()
+				.map(el -> el.getElementsByAttributeValue("itemprop", "description"))
+				.map(Elements::text)
+				.orElseGet(String::new);
 	}
 
 	private float getRating(Document seriesDocument) {
