@@ -7,7 +7,7 @@ services:
     links:
       - redis
     env_file:
-      - security_credentials.env
+      - environment_variables.env
   redis:
     image: redis
     ports:
