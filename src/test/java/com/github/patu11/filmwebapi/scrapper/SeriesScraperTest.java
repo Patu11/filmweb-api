@@ -2,13 +2,8 @@ package com.github.patu11.filmwebapi.scrapper;
 
 import com.github.patu11.filmwebapi.scrapper.model.Episode;
 import com.github.patu11.filmwebapi.scrapper.model.Series;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.io.File;
-import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -28,9 +23,7 @@ class SeriesScraperTest {
 
 	@BeforeAll
 	public static void setup() {
-		SeriesScraper seriesScraper = new SeriesScraper();
-		Document document = getDocumentFromPath("src/test/java/com/github/patu11/filmwebapi/scrapper/documents/limitless.html");
-		series = seriesScraper.getSeries(document);
+		series = new SeriesScraper().getSeries(URL);
 	}
 
 	@Test
@@ -84,13 +77,5 @@ class SeriesScraperTest {
 	public void firstEpisodeShouldHaveCorrectRating() {
 		Episode firstEpisode = series.seasons().get(0).episodes().get(0);
 		assertEquals(FIRST_EPISODE_RATING, firstEpisode.rating());
-	}
-
-	private static Document getDocumentFromPath(String fileName) {
-		try {
-			return Jsoup.parse(new File(fileName), "utf-8");
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
 	}
 }
