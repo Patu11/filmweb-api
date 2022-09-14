@@ -5,7 +5,7 @@ mvnw
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-security_credentials.env
+environment_variables.env
 
 ### STS ###
 .apt_generated

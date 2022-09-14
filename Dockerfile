@@ -3,7 +3,7 @@ FROM maven:3.8-openjdk-17 AS maven
 WORKDIR /build
 COPY . /build
 
-RUN mvn package
+RUN mvn package -Dmaven.test.skip
 
 FROM openjdk:17-alpine
 
