@@ -1,24 +1,26 @@
 package com.github.patu11.filmwebapi.scrapper;
 
-import com.github.patu11.filmwebapi.scrapper.model.Episode;
-import com.github.patu11.filmwebapi.scrapper.model.Season;
-import com.github.patu11.filmwebapi.scrapper.model.Series;
-import org.jsoup.Jsoup;
+import com.github.patu11.filmwebapi.model.Episode;
+import com.github.patu11.filmwebapi.model.Season;
+import com.github.patu11.filmwebapi.model.Series;
+import lombok.AllArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.patu11.filmwebapi.scrapper.ScrapingVars.*;
+
 @Component
+@AllArgsConstructor
 public class SeriesScraper {
-	private static final String FILMWEB_URL = "https://www.filmweb.pl";
+	private final Connection connection;
 
 	public Series getSeries(String seriesUrl) {
-		Document seriesDocument = getDocumentFromUrl(seriesUrl);
+		Document seriesDocument = connection.connect(seriesUrl);
 		return getSeries(seriesDocument);
 	}
 
@@ -27,17 +29,17 @@ public class SeriesScraper {
 	}
 
 	private String getSeriesDescription(Document seriesDocument) {
-		Elements descriptionSection = seriesDocument.getElementsByClass("filmPosterSection__plot");
+		Elements descriptionSection = seriesDocument.getElementsByClass(FILM_POSTER_SECTION.value);
 		return descriptionSection.stream()
 				.findFirst()
-				.map(el -> el.getElementsByAttributeValue("itemprop", "description"))
+				.map(el -> el.getElementsByAttributeValue(ITEMPROP.value, DESCRIPTION.value))
 				.map(Elements::text)
 				.orElseGet(String::new);
 	}
 
 	private float getRating(Document seriesDocument) {
-		Elements ratingPanel = seriesDocument.getElementsByClass("filmRating--hasPanel");
-		String rating = ratingPanel.select(".filmRating__rateValue").text();
+		Elements ratingPanel = seriesDocument.getElementsByClass(FILMRATING_PANEL.value);
+		String rating = ratingPanel.select(FILMRATING_RATE_VALUE.value).text();
 		return Float.parseFloat(rating.replace(",", "."));
 	}
 
@@ -48,21 +50,21 @@ public class SeriesScraper {
 	}
 
 	private String getTitle(Document seriesDocument) {
-		String largeTitle = seriesDocument.getElementsByClass("filmCoverSection__title").stream()
+		String largeTitle = seriesDocument.getElementsByClass(FILMCOVER_TITLE.value).stream()
 				.findFirst()
 				.map(Element::text)
 				.orElseGet(String::new);
 
-		return seriesDocument.getElementsByClass("filmCoverSection__originalTitle").stream()
+		return seriesDocument.getElementsByClass(FILMCOVER_ORIGINAL_TITLE.value).stream()
 				.findFirst()
 				.map(Element::text)
 				.orElse(largeTitle);
 	}
 
 	private String getPhotoUrl(Document seriesDocument) {
-		return Optional.ofNullable(seriesDocument.getElementById("filmPoster"))
-				.map(img -> img.attr("content"))
-				.orElseThrow(() -> new RuntimeException("Photo not found"));
+		return Optional.ofNullable(seriesDocument.getElementById(FILM_POSTER.value))
+				.map(img -> img.attr(CONTENT.value))
+				.orElseGet(String::new);
 	}
 
 	private Season mapSeason(String seasonUrl) {
@@ -70,8 +72,8 @@ public class SeriesScraper {
 	}
 
 	private int getSeasonNumber(String seasonUrl) {
-		Document seasonDoc = getDocumentFromUrl(seasonUrl);
-		return seasonDoc.getElementsByClass("filmHeaderSection__title")
+		Document seasonDoc = connection.connect(seasonUrl);
+		return seasonDoc.getElementsByClass(FILM_HEADER.value)
 				.stream()
 				.findFirst()
 				.map(Element::text)
@@ -79,24 +81,24 @@ public class SeriesScraper {
 				.orElse(-1);
 	}
 
-	private int mapSeasonNumber(String seasonTitle) {
-		String number = seasonTitle.split(":")[0].split("\\s+")[1];
-		return Integer.parseInt(number);
-	}
-
 	private List<Episode> getSeasonEpisodes(String seasonUrl) {
-		Document seasonDoc = getDocumentFromUrl(seasonUrl);
-		Elements episodes = seasonDoc.getElementsByClass("previewEpisode");
-		Elements cards = episodes.select(".preview__card");
+		Document seasonDoc = connection.connect(seasonUrl);
+		Elements episodes = seasonDoc.getElementsByClass(PREVIEW_EPISODE.value);
+		Elements cards = episodes.select(PREVIEW_CARD.value);
 
 		return cards.stream()
 				.map(this::mapEpisode)
 				.toList();
 	}
 
+	private int mapSeasonNumber(String seasonTitle) {
+		String number = seasonTitle.split(":")[0].split("\\s+")[1];
+		return Integer.parseInt(number);
+	}
+
 	private Episode mapEpisode(Element previewCard) {
-		Elements previewLink = previewCard.select(".preview__link");
-		Elements previewHeader = previewCard.select(".preview__header");
+		Elements previewLink = previewCard.select(PREVIEW_LINK.value);
+		Elements previewHeader = previewCard.select(PREVIEW_HEADER.value);
 
 		String title = getEpisodeTitle(previewLink);
 		String date = getEpisodeDate(previewLink);
@@ -107,16 +109,16 @@ public class SeriesScraper {
 	}
 
 	private String getEpisodeDescription(Elements previewHeader) {
-		Elements previewLink = previewHeader.select(".preview__link");
+		Elements previewLink = previewHeader.select(PREVIEW_LINK.value);
 		Optional<String> episodeUrl = getEpisodeUrl(previewLink);
 
 		if (episodeUrl.isEmpty()) {
 			return "";
 		}
 
-		Document episodeDocument = getDocumentFromUrl(FILMWEB_URL + episodeUrl.get());
+		Document episodeDocument = connection.connect(FILMWEB_URL + episodeUrl.get());
 
-		return episodeDocument.getElementsByClass("descriptionSection__text").stream()
+		return episodeDocument.getElementsByClass(DESCRIPTION_SECTION.value).stream()
 				.findFirst()
 				.map(Element::text)
 				.orElseGet(String::new);
@@ -125,7 +127,7 @@ public class SeriesScraper {
 	private float getEpisodeRating(Elements previewLink) {
 		String episodeUrl = getEpisodeUrl(previewLink).orElseGet(String::new);
 
-		Document episodeDoc = getDocumentFromUrl(FILMWEB_URL + episodeUrl);
+		Document episodeDoc = connection.connect(FILMWEB_URL + episodeUrl);
 
 		return episodeDoc.getElementsByClass("filmRating__rateValue").stream()
 				.findFirst()
@@ -138,17 +140,17 @@ public class SeriesScraper {
 	private String getEpisodeTitle(Elements previewLink) {
 		return previewLink.stream()
 				.findFirst()
-				.map(el -> el.getElementsByAttribute("data-source-title").text())
+				.map(el -> el.getElementsByAttribute(DATA_SOURCE_TITLE.value).text())
 				.orElseGet(String::new);
 	}
 
 	private String getEpisodeDate(Elements previewLink) {
-		return previewLink.select(".preview__year").text();
+		return previewLink.select(PREVIEW_YEAR.value).text();
 	}
 
 	private List<String> getSeasonsUrls(Document seriesDocument) {
-		return seriesDocument.getElementsByClass("squareNavigation__item").stream()
-				.map(el -> el.attr("href"))
+		return seriesDocument.getElementsByClass(SQUARE_NAV.value).stream()
+				.map(el -> el.attr(HREF.value))
 				.map(url -> FILMWEB_URL + url)
 				.toList();
 	}
@@ -156,23 +158,15 @@ public class SeriesScraper {
 	private Optional<String> getEpisodeUrl(Elements previewLink) {
 		return previewLink.stream()
 				.findFirst()
-				.map(el -> el.attr("href"));
+				.map(el -> el.attr(HREF.value));
 	}
 
 	private String getSeriesUrl(Document seriesDocument) {
-		return seriesDocument.getElementsByTag("link")
+		return seriesDocument.getElementsByTag(LINK.value)
 				.stream()
-				.map(el -> el.attr("href"))
+				.map(el -> el.attr(HREF.value))
 				.filter(href -> href.startsWith(FILMWEB_URL + "/serial/"))
 				.findFirst()
 				.orElseGet(String::new);
-	}
-
-	private Document getDocumentFromUrl(String url) {
-		try {
-			return Jsoup.connect(url).get();
-		} catch (IOException e) {
-			throw new RuntimeException("Cannot get document");
-		}
 	}
 }

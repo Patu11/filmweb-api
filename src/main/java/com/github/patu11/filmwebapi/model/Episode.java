@@ -1,4 +1,4 @@
-package com.github.patu11.filmwebapi.scrapper.model;
+package com.github.patu11.filmwebapi.model;
 
 import java.io.Serializable;
 

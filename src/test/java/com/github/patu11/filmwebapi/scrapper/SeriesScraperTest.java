@@ -1,7 +1,7 @@
 package com.github.patu11.filmwebapi.scrapper;
 
-import com.github.patu11.filmwebapi.scrapper.model.Episode;
-import com.github.patu11.filmwebapi.scrapper.model.Series;
+import com.github.patu11.filmwebapi.model.Episode;
+import com.github.patu11.filmwebapi.model.Series;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ class SeriesScraperTest {
 
 	@BeforeAll
 	public static void setup() {
-		series = new SeriesScraper().getSeries(URL);
+		series = new SeriesScraper(new FilmwebConnection()).getSeries(URL);
 	}
 
 	@Test
