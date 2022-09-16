@@ -2,7 +2,7 @@ package com.github.patu11.filmwebapi.api.service;
 
 import com.github.patu11.filmwebapi.api.dto.SeriesRequest;
 import com.github.patu11.filmwebapi.scrapper.SeriesScraper;
-import com.github.patu11.filmwebapi.scrapper.model.Series;
+import com.github.patu11.filmwebapi.model.Series;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
