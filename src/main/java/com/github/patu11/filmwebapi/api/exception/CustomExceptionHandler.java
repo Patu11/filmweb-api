@@ -21,4 +21,10 @@ public class CustomExceptionHandler {
 		ErrorMessage message = new ErrorMessage(HttpStatus.NOT_FOUND.value(), LocalDateTime.now(), ex.getMessage());
 		return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
 	}
+
+	@ExceptionHandler(value = {LogFilesNotFoundException.class})
+	public ResponseEntity<ErrorMessage> logFilesNotFoundException(LogFilesNotFoundException ex) {
+		ErrorMessage message = new ErrorMessage(HttpStatus.NOT_FOUND.value(), LocalDateTime.now(), ex.getMessage());
+		return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+	}
 }
