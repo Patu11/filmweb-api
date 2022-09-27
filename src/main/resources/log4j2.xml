@@ -2,7 +2,7 @@
 <Configuration status="WARN" monitorInterval="30">
     <Properties>
         <Property name="LOG_PATTERN">
-            %d{yyyy-MM-dd HH:mm:ss.SSS} %5p [%t] %c{1.}: %m%n
+            %d{yyyy-MM-dd HH:mm:ss.SSS} %p [%t] %c{1.}: %m%n
         </Property>
         <Property name="LOG_DIRECTORY">
             ${env:LOG_DIR}
