@@ -8,6 +8,8 @@ services:
       - redis
     env_file:
       - environment_variables.env
+    volumes:
+      - $LOG_DIR_HOST:$LOG_DIR_GUEST
   redis:
     image: redis
     ports:

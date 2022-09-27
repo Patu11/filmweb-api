@@ -6,6 +6,7 @@ mvnw
 !**/src/main/**/target/
 !**/src/test/**/target/
 environment_variables.env
+.env
 
 ### STS ###
 .apt_generated
