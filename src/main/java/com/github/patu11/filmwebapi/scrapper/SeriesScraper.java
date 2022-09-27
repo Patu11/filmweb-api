@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import static com.github.patu11.filmwebapi.scrapper.ScrapingVars.*;
 @Component
 @AllArgsConstructor
 public class SeriesScraper {
+	private final Logger logger = LoggerFactory.getLogger(SeriesScraper.class);
 	private final Connection connection;
 
 	public Series getSeries(String seriesUrl) {
@@ -29,6 +32,7 @@ public class SeriesScraper {
 	}
 
 	private String getSeriesDescription(Document seriesDocument) {
+		logger.info("Getting series description.");
 		Elements descriptionSection = seriesDocument.getElementsByClass(FILM_POSTER_SECTION.value);
 		return descriptionSection.stream()
 				.findFirst()
@@ -38,18 +42,21 @@ public class SeriesScraper {
 	}
 
 	private float getRating(Document seriesDocument) {
+		logger.info("Getting series rating.");
 		Elements ratingPanel = seriesDocument.getElementsByClass(FILMRATING_PANEL.value);
 		String rating = ratingPanel.select(FILMRATING_RATE_VALUE.value).text();
 		return Float.parseFloat(rating.replace(",", "."));
 	}
 
 	private List<Season> getSeasons(Document seriesDocument) {
+		logger.info("Getting series seasons.");
 		return getSeasonsUrls(seriesDocument).stream()
 				.map(this::mapSeason)
 				.toList();
 	}
 
 	private String getTitle(Document seriesDocument) {
+		logger.info("Getting series title.");
 		String largeTitle = seriesDocument.getElementsByClass(FILMCOVER_TITLE.value).stream()
 				.findFirst()
 				.map(Element::text)
@@ -62,6 +69,7 @@ public class SeriesScraper {
 	}
 
 	private String getPhotoUrl(Document seriesDocument) {
+		logger.info("Getting series photo url.");
 		return Optional.ofNullable(seriesDocument.getElementById(FILM_POSTER.value))
 				.map(img -> img.attr(CONTENT.value))
 				.orElseGet(String::new);
@@ -162,6 +170,7 @@ public class SeriesScraper {
 	}
 
 	private String getSeriesUrl(Document seriesDocument) {
+		logger.info("Getting series url.");
 		return seriesDocument.getElementsByTag(LINK.value)
 				.stream()
 				.map(el -> el.attr(HREF.value))
