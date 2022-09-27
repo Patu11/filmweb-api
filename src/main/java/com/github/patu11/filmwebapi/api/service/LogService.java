@@ -1,6 +1,7 @@
 package com.github.patu11.filmwebapi.api.service;
 
 import com.github.patu11.filmwebapi.api.exception.LogFilesNotFoundException;
+import com.github.patu11.filmwebapi.model.LogInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,8 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
@@ -23,10 +22,11 @@ public class LogService {
 	@Value("${logs.directory}")
 	private String logsDirectory;
 
-	public Map<String, String> getLogs() {
+	public List<LogInfo> getLogs() {
 		logger.info("Starting getting logs.");
 		return getLogFilesNames().stream()
-				.collect(Collectors.toMap(file -> file, this::getFileContent));
+				.map(f -> new LogInfo(f, getFileContent(f)))
+				.toList();
 	}
 
 	private List<String> getLogFilesNames() {
@@ -43,11 +43,11 @@ public class LogService {
 		}
 	}
 
-	private String getFileContent(String fileName) {
+	private List<String> getFileContent(String fileName) {
 		Path path = Paths.get(logsDirectory + File.separator + fileName);
 		try {
 			Stream<String> lines = Files.lines(path);
-			String content = lines.collect(Collectors.joining("\n"));
+			List<String> content = lines.toList();
 			lines.close();
 			return content;
 		} catch (IOException e) {
