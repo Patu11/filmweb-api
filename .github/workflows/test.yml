@@ -12,6 +12,7 @@ jobs:
       REDIS_HOST: ${{ secrets.REDIS_HOST }}
       REDIS_PORT: ${{ secrets.REDIS_PORT }}
       CACHE_TYPE: ${{ secrets.CACHE_TYPE }}
+      LOG_DIR: DIR
     steps:
       - uses: actions/checkout@v2.4.2
       - name: Set up JDK 17
