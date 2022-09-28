@@ -1,34 +1,48 @@
-package com.github.patu11.filmwebapi.scrapper;
+package com.github.patu11.filmwebapi.scrapper.filmweb;
 
 import com.github.patu11.filmwebapi.model.Episode;
 import com.github.patu11.filmwebapi.model.Season;
 import com.github.patu11.filmwebapi.model.Series;
-import lombok.AllArgsConstructor;
+import com.github.patu11.filmwebapi.scrapper.Connection;
+import com.github.patu11.filmwebapi.scrapper.Scraper;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.github.patu11.filmwebapi.scrapper.ScrapingVars.*;
+import static com.github.patu11.filmwebapi.scrapper.filmweb.FilmwebScrapingVars.*;
 
 @Component
-@AllArgsConstructor
-public class SeriesScraper {
-	private final Logger logger = LoggerFactory.getLogger(SeriesScraper.class);
+public class FilmwebScraper implements Scraper {
+	private final Logger logger = LoggerFactory.getLogger(FilmwebScraper.class);
+
 	private final Connection connection;
 
+	public FilmwebScraper(@Qualifier("filmwebConnection") Connection connection) {
+		this.connection = connection;
+	}
+
+	@Override
 	public Series getSeries(String seriesUrl) {
 		Document seriesDocument = connection.connect(seriesUrl);
 		return getSeries(seriesDocument);
 	}
 
+	@Override
 	public Series getSeries(Document seriesDocument) {
-		return new Series(getSeriesUrl(seriesDocument), getTitle(seriesDocument), getPhotoUrl(seriesDocument), getRating(seriesDocument), getSeriesDescription(seriesDocument), getSeasons(seriesDocument));
+		return new Series(
+				getSeriesUrl(seriesDocument),
+				getTitle(seriesDocument),
+				getPhotoUrl(seriesDocument),
+				getRating(seriesDocument),
+				getSeriesDescription(seriesDocument),
+				getSeasons(seriesDocument));
 	}
 
 	private String getSeriesDescription(Document seriesDocument) {

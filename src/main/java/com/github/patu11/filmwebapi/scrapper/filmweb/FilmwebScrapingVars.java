@@ -1,6 +1,6 @@
-package com.github.patu11.filmwebapi.scrapper;
+package com.github.patu11.filmwebapi.scrapper.filmweb;
 
-public enum ScrapingVars {
+public enum FilmwebScrapingVars {
 	FILMWEB_URL("https://www.filmweb.pl"),
 	HREF("href"),
 	PREVIEW_LINK(".preview__link"),
@@ -25,7 +25,7 @@ public enum ScrapingVars {
 
 	final String value;
 
-	ScrapingVars(String value) {
+	FilmwebScrapingVars(String value) {
 		this.value = value;
 	}
 
