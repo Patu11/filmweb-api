@@ -1,5 +1,6 @@
 package com.github.patu11.filmwebapi.api.exception;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -26,5 +27,11 @@ public class CustomExceptionHandler {
 	public ResponseEntity<ErrorMessage> logFilesNotFoundException(LogFilesNotFoundException ex) {
 		ErrorMessage message = new ErrorMessage(HttpStatus.NOT_FOUND.value(), LocalDateTime.now(), ex.getMessage());
 		return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(value = {NotImplementedException.class})
+	public ResponseEntity<ErrorMessage> notImplementedException(NotImplementedException ex) {
+		ErrorMessage message = new ErrorMessage(HttpStatus.NOT_FOUND.value(), LocalDateTime.now(), ex.getMessage());
+		return new ResponseEntity<>(message, HttpStatus.NOT_IMPLEMENTED);
 	}
 }

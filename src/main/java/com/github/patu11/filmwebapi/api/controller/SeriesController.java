@@ -4,10 +4,7 @@ import com.github.patu11.filmwebapi.api.dto.SeriesRequest;
 import com.github.patu11.filmwebapi.api.service.SeriesService;
 import com.github.patu11.filmwebapi.model.Series;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -15,8 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class SeriesController {
 	private final SeriesService seriesService;
 
-	@PostMapping("/series")
-	public Series getSeries(@RequestBody SeriesRequest seriesRequest) {
-		return seriesService.getSeries(seriesRequest);
+	@PostMapping("/{service}/series")
+	public Series getSeries(@RequestBody SeriesRequest seriesRequest, @PathVariable String service) {
+		return seriesService.getSeries(seriesRequest, service);
 	}
 }

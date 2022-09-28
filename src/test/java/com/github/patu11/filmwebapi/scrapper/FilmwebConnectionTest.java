@@ -1,6 +1,7 @@
 package com.github.patu11.filmwebapi.scrapper;
 
 import com.github.patu11.filmwebapi.api.exception.WrongUrlException;
+import com.github.patu11.filmwebapi.scrapper.filmweb.FilmwebConnection;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
