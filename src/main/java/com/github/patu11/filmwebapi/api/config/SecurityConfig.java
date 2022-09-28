@@ -26,6 +26,7 @@ public class SecurityConfig {
 				.csrf().disable()
 				.authorizeRequests()
 				.antMatchers("/").permitAll()
+				.antMatchers("/auth/**").permitAll()
 				.antMatchers("/v3/api-docs/**").permitAll()
 				.antMatchers("/swagger-ui/**").permitAll()
 				.antMatchers("/docs").permitAll()

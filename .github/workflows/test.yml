@@ -13,6 +13,8 @@ jobs:
       REDIS_PORT: ${{ secrets.REDIS_PORT }}
       CACHE_TYPE: ${{ secrets.CACHE_TYPE }}
       LOG_DIR: ${{ secrets.LOG_DIR }}
+      SECURITY_USERNAME: TEMP
+      SECURITY_PASSWORD: TEMP
     steps:
       - uses: actions/checkout@v2.4.2
       - name: Set up JDK 17
